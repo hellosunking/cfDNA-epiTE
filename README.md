@@ -321,11 +321,11 @@ Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.chromatin.state.coverage.pool N
 ## size distribution for different chromatin state (Fig. 3c)
 exampleSid=L01_2
 Rscript $PRG/plot.mix.size.R $exampleSid.size.pdf $PRG/Processed.files/$exampleSid.E5.size TssA \
-$PRG/$exampleSid/$exampleSid.E2.size Enh1 \
-$PRG/exampleSid/$exampleSid.E9.size Tx \
-$PRG/exampleSid/$exampleSid.E13.size ReprPC \
-$PRG/exampleSid/$exampleSid.E15.size Het \
-$PRG/exampleSid/$exampleSid.E11.size Quies1
+$PRG/Processed.files/$exampleSid.E2.size Enh1 \
+$PRG/Processed.files/$exampleSid.E9.size Tx \
+$PRG/Processed.files/$exampleSid.E13.size ReprPC \
+$PRG/Processed.files/$exampleSid.E15.size Het \
+$PRG/Processed.files/$exampleSid.E11.size Quies1
 ```
 
 ## 7. TEANA-Dx and TEANA-Top models
