@@ -271,7 +271,8 @@ Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.H3K27ac.Alu.coverage.pool NC24.
 Chromatin states were defined on cfChIP-seq data of 6 histone modifications (H3K27ac, H3K4me1, H3K4me3, H3K36me3, H3K27me3, and H3K9me3) segmented using chromHMM software.
 ```
 ## define chromatin states
-## put (or link) the cfChIP-seq data to "3.fragmentomics.epigenetics/3.chromatin.state/bed.file" directory
+## put (or link) the cfChIP-seq and cfDNA WGS data (as input) to "3.fragmentomics.epigenetics/3.chromatin.state/bed.file",
+## and make sure the file names are consistent with that in "markers.table" file
 PRG=3.fragmentomics.epigenetics/3.chromatin.state
 java -mx32G -jar $PRG/ChromHMM.jar BinarizeBed -b 200 -f 2 -t out.signal $PRG/hg38.txt $PRG/bed.file/ $PRG/bed.file/markers.table $PRG/BinarizedTable
 java -mx32G -jar $PRG/ChromHMM.jar LearnModel -r 1000 -b 200 -noautoopen -p 16 $PRG/BinarizedTable $PRG/State15 15 hg38

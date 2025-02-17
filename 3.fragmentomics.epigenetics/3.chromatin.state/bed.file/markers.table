@@ -1,0 +1,6 @@
+cfDNA	H3K27ac	H3K27ac.bed	cfDNAWGSinput.bed
+cfDNA	H3K4me1	H3K4me1.bed	cfDNAWGSinput.bed
+cfDNA	H3K4me3	H3K4me3.bed	cfDNAWGSinput.bed
+cfDNA	H3K36me3	H3K36me3.bed	cfDNAWGSinput.bed
+cfDNA	H3K9me3	H3K9me3.bed	cfDNAWGSinput.bed
+cfDNA	H3K27me3	H3K27me3.bed	cfDNAWGSinput.bed
