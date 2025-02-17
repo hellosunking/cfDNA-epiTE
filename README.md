@@ -145,11 +145,11 @@ Rscript $PRG/control.coverage.bar.plot.R $PRG/Processed.files/$cohort.coverage.p
 
 ## size distribution (Fig. 1b)
 exampleSid=L01_2   ## this sample is choosen as an example
-R --slave --args $cohort.size.pdf $PRG/Processed.files/$exampleSid.Overall.size $exampleSid.all \
+Rscript $PRG/plot.size.log.R $cohort.size.pdf $PRG/Processed.files/$exampleSid.Overall.size $exampleSid.all \
 $PRG/Processed.files/$exampleSid.LINE.L1.size $exampleSid.LINE.L1 \
 $PRG/Processed.files/$exampleSid.SINE.Alu.size $exampleSid.SINE.Alu \
 $PRG/Processed.files/$exampleSid.SINE.MIR.size $exampleSid.SINE.MIR \
-$PRG/Processed.files/$exampleSid.LTR.ERVL.size $exampleSid.LTR.ERVL < $PRG/plot.size.log.R
+$PRG/Processed.files/$exampleSid.LTR.ERVL.size $exampleSid.LTR.ERVL
 
 ## boxplot for cancer vs controls and ROC analyses (Fig. 4,5)
 for cohortID in HCC Liang Cristiano Bie
@@ -320,12 +320,12 @@ Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.chromatin.state.coverage.pool N
 
 ## size distribution for different chromatin state (Fig. 3c)
 exampleSid=L01_2
-R --slave --args $exampleSid.size.pdf $PRG/Processed.files/$exampleSid.E5.size TssA \
+Rscript $PRG/plot.mix.size.R $exampleSid.size.pdf $PRG/Processed.files/$exampleSid.E5.size TssA \
 $PRG/$exampleSid/$exampleSid.E2.size Enh1 \
 $PRG/exampleSid/$exampleSid.E9.size Tx \
 $PRG/exampleSid/$exampleSid.E13.size ReprPC \
 $PRG/exampleSid/$exampleSid.E15.size Het \
-$PRG/exampleSid/$exampleSid.E11.size Quies1 < $PRG/plot.mix.size.R
+$PRG/exampleSid/$exampleSid.E11.size Quies1
 ```
 
 ## 7. TEANA-Dx and TEANA-Top models
