@@ -49,15 +49,17 @@ if (n==18){
 	auc=vector()
 	p=vector()
 	num=length(b)
-	for (i in c(1:num)){
-		data.type=data[data$Group == type[ca] | data$Group=="0.Control",]
-		data.roc <- roc(data.type$Group , data.type[,b[i]])
-		auc[i]=round(data.roc$auc,3)
-		p[i] = sprintf("%.2e", pROC.p(data.roc))
-		if(i==1){
-			plot(data.roc,col=col[i],legacy.axes=F,lwd= 2,main = paste0(type[ca],",",bb,"-P<0.05"),cex.main=0.8)
-		}else{
-			plot(data.roc,add=TRUE,col=col[i],lwd= 2)
+	if (num!=0){
+		for (i in c(1:num)){
+			data.type=data[data$Group == type[ca] | data$Group=="0.Control",]
+			data.roc <- roc(data.type$Group , data.type[,b[i]])
+			auc[i]=round(data.roc$auc,3)
+			p[i] = sprintf("%.2e", pROC.p(data.roc))
+			if(i==1){
+				plot(data.roc,col=col[i],legacy.axes=F,lwd= 2,main = paste0(type[ca],",",bb,"-P<0.05"),cex.main=0.8)
+			}else{
+				plot(data.roc,add=TRUE,col=col[i],lwd= 2)
+			}
 		}
 	}
 	legend("bottomright",legend=c(paste0(b," AUC=",auc,", p=",p)),col=col,lty=1,bty="n",cex=0.7)
@@ -82,24 +84,26 @@ if (n==18){
 		delong.p=vector()
 		data.type=data[data$Group == type[ca] | data$Group=="0.Control",]
 		roc.overall<-roc(data.type$Group , data.type[,"Genomewide"])
-		for (i in c(1:num)){
-			#data.type=data[data$Group == type[ca] | data$Group=="0.Control",]
-			data.roc <- roc(data.type$Group , data.type[,b[i]])
-			auc[i]=round(data.roc$auc,3)
-			p[i] = sprintf("%.2e", pROC.p(data.roc))
-			delong=roc.test( data.roc,  roc.overall )
-			delong.p[i] = sprintf("%.3e", delong$p.value)
-			if(i==1){
-				plot(data.roc,col=col[i],legacy.axes=F,lwd= 2,main = paste0(type[ca],",",bb,"-P<0.05"),cex.main=0.8)
-			}else{
-				plot(data.roc,add=TRUE,col=col[i],lwd= 2)
+		if (num!=0){
+			for (i in c(1:num)){
+				#data.type=data[data$Group == type[ca] | data$Group=="0.Control",]
+				data.roc <- roc(data.type$Group , data.type[,b[i]])
+				auc[i]=round(data.roc$auc,3)
+				p[i] = sprintf("%.2e", pROC.p(data.roc))
+				delong=roc.test( data.roc,  roc.overall )
+				delong.p[i] = sprintf("%.3e", delong$p.value)
+				if(i==1){
+					plot(data.roc,col=col[i],legacy.axes=F,lwd= 2,main = paste0(type[ca],",",bb,"-P<0.05"),cex.main=0.8)
+				}else{
+					plot(data.roc,add=TRUE,col=col[i],lwd= 2)
+				}
 			}
+			plot(roc.overall,add=TRUE,col="#808080",lwd= 2)
+			auc[num+1]=round(roc.overall$auc,3)
+			p[num+1] = sprintf("%.3e", pROC.p(roc.overall));
+			delong.p[num+1]=NA
+			legend("bottomright",legend=c(paste0(append(b,"Genomewide")," AUC=",auc,", p=",p,",Delong.p=", delong.p)),col=c(col[1:16],"#808080"),lty=1,bty="n",cex=0.7)
 		}
-		plot(roc.overall,add=TRUE,col="#808080",lwd= 2)
-		auc[num+1]=round(roc.overall$auc,3)
-		p[num+1] = sprintf("%.3e", pROC.p(roc.overall));
-		delong.p[num+1]=NA
-		legend("bottomright",legend=c(paste0(append(b,"Genomewide")," AUC=",auc,", p=",p,",Delong.p=", delong.p)),col=c(col[1:16],"#808080"),lty=1,bty="n",cex=0.7)
 	}
 }
 dev.off()
@@ -124,7 +128,7 @@ for (n in c(3:18)) {
 		auc[i]=round(data.roc$auc,3)
 		p[i] = sprintf("%.3e", pROC.p(data.roc));
 		if(i==1){
-			  plot(data.roc,col=col[i],legacy.axes=F,lwd= 2,main = paste0("bb.",te.name),cex.main=0.8)
+			  plot(data.roc,col=col[i],legacy.axes=F,lwd= 2,main = paste0(bb,", ",te.name),cex.main=0.8)
 		}else{
 			  plot(data.roc,add=TRUE,col=col[i],lwd= 2)
 		}

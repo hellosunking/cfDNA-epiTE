@@ -6,8 +6,9 @@ out=open(argv[1],'w')
 f=open(argv[2],"r")
 lable=["Bile","Breast","Colorectal","Gastric","Lung","Ovarian","Pancreatic"]
 for line in f:
-	dic[line.strip().split("\t")[0]]=[]
-	type[line.strip().split("\t")[0]]=line.strip().split("\t")[1]
+	if  line.strip().split("\t")[1] != "Control" :
+		dic[line.strip().split("\t")[0]]=[]
+		type[line.strip().split("\t")[0]]=line.strip().split("\t")[1]
 for i in range(7):
 	fh=open(argv[i+3],'r')
 	#fh.readline()

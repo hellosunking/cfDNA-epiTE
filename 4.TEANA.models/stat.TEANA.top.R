@@ -21,4 +21,4 @@ multiclass.roc(response=pred.tbl$Type,predictor=p2)
 
 b=c("Bile","Breast","Colorectal","Gastric","Lung","Ovarian","Pancreatic")
 predlab=b[apply(p2,1,which.max)]
-confusionMatrix(data=as.factor(predlab),reference=pred.tbl$Type,mode="everything")
+confusionMatrix(data=as.factor(predlab),reference=as.factor(pred.tbl$Type),mode="everything")

@@ -318,26 +318,29 @@ For whole genome sequencing data, we used the following cfDNA fragmentomic featu
 PRG=4.TEANA.models
 
 ## Cristiano et al. dataset (Fig. 6a,b,c)
-mkdir -p $PRG/Cristinao.Dx
-Rscript $PRG/TEANA-Dx.R $PRG/Cristinao.matrix $PRG/Cristinao.Dx > Cristiano.Dx.log
-python $PRG/average.py  $PRG/Cristinao.Dx/test_pred[0-9]* Cristiano.predict
-Rscript $PRG/roc.R Cristiano.predict $PRG/Cristinao.Dx Cristinao.final > Cristiano.mean.roc.log
+mkdir -p $PRG/Cristiano.Dx
+cp $PRG/Cristiano.matrix $PRG/Cristiano.Dx
+Rscript $PRG/TEANA-Dx.R Cristiano.matrix $PRG/Cristiano.Dx > Cristiano.Dx.log
+python $PRG/average.py  $PRG/Cristiano.Dx/test_pred[0-9]* Cristiano.predict
+Rscript $PRG/roc.R Cristiano.predict $PRG/Cristiano.Dx Cristiano.final > Cristiano.mean.roc.log
 ## statistics and ROCs
-Rscript $PRG/TEANA-Dx.stage.R  Cristiano.predict $PRG/Cristinao.metadata
-Rscript $PRG/TEANA-Dx.tissue.R Cristiano.predict $PRG/Cristinao.metadata
+Rscript $PRG/TEANA-Dx.stage.R  Cristiano.predict $PRG/Cristiano.metadata Cristiano
+Rscript $PRG/TEANA-Dx.tissue.R Cristiano.predict $PRG/Cristiano.metadata Cristiano
 
 ## Bie et al. dataset (Fig. 6d,e,f)
 mkdir -p $PRG/Bie.Dx
-Rscript $PRG/TEANA-Dx.R $PRG/Bie.matrix $PRG/Bie.Dx > Bie.Dx.log
+cp $PRG/Bie.matrix $PRG/Bie.Dx
+Rscript $PRG/TEANA-Dx.R Bie.matrix $PRG/Bie.Dx > Bie.Dx.log
 python $PRG/average.py  $PRG/Bie.Dx/test_pred[0-9]* Bie.predict
 Rscript $PRG/roc.R Bie.predict $PRG/Bie.Dx Bie.final > Bie.mean.roc.log
 ## statistics and ROCs
-Rscript $PRG/TEANA-Dx.stage.R  Bie.predict $PRG/Bie.metadata
-Rscript $PRG/TEANA-Dx.tissue.R Bie.predict $PRG/Bie.metadata
+Rscript $PRG/TEANA-Dx.stage.R  Bie.predict $PRG/Bie.metadata Bie
+Rscript $PRG/TEANA-Dx.tissue.R Bie.predict $PRG/Bie.metadata Bie
 
 ## TEANA-Top model
-mkdir -p $PRG/Cristinao.Top
-Rscript $PRG/TEANA-Top.R $PRG/Cristinao.matrix $PRG/Cristinao.Top > Cristiano.Top.log
-python $PRG/get.multi.matrix.py Cristinao.multi.matrix Cristinao.cancer.matrix Bile Breast Colorectal Gastric Lung Ovarian Pancreatic
-Rscript $PRG/stat.TEANA.top.R Cristinao.multi.matrix > TEANA-Top.predict.stat
+mkdir -p $PRG/Cristiano.Top
+cp $PRG/Cristiano.cancer.matrix $PRG/Cristiano.Top
+Rscript $PRG/TEANA-Top.R Cristiano.cancer.matrix $PRG/Cristiano.Top > Cristiano.Top.log
+python $PRG/get.multi.matrix.py Cristiano.multi.matrix Cristiano.cancer.matrix Bile Breast Colorectal Gastric Lung Ovarian Pancreatic
+Rscript $PRG/stat.TEANA.top.R Cristiano.multi.matrix > TEANA-Top.predict.stat
 ```

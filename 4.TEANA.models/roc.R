@@ -24,7 +24,7 @@ test_r
 plot(test_r,legacy.axes=T,lwd= 2)
 abline(v=0.95,col="gray60",lty=2)
 auc=round(test_r$auc,3)
-legend("bottomright",legend=c(paste0(dd," AUC=",auc)),lty=1,bty="n",cex=0.8)
+legend("bottomright",legend=c(paste0(cc," AUC=",auc)),lty=1,bty="n",cex=0.8)
 print(ci.se(test_r))
 print(ci.se(test_r,specificities=c(0.95,0.98,1.0)))
 dev.off()

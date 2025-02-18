@@ -18,6 +18,7 @@ size <- read.table(bb,header=T,sep = "\t")
 
 a <- merge(test,size,by = intersect(names(size)[1],names(test)[1]))[,c(1,2,3,5)]
  a <-  na.omit(a)
+head(a)
 
 pROC.p = function( rr ) {
 	  v  = var( rr );

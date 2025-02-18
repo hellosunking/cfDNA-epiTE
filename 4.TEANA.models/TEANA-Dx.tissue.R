@@ -12,15 +12,13 @@ library(binom)
 aa<- args[1]
 bb<- args[2]
 cc<- args[3]
-dd<- args[4]
 
 test<-read.table(file =  aa,header=T)
-train<-read.table(file = bb,header=T)
-size <- read.table(cc,header=T,sep = "\t")
+size <- read.table(bb,header=T,sep = "\t")
 
-a <- merge(test,size,by = intersect(names(size)[1],names(test)[1]))[,c(1,2,3,5)]
+a <- merge(test,size,by = intersect(names(size)[1],names(test)[1]))[,c(1,2,3,4)]
  a <-  na.omit(a)
-
+head(a)
 pROC.p = function( rr ) {
 	  v  = var( rr );
   b  = rr$auc - 0.5;
@@ -30,15 +28,18 @@ pROC.p = function( rr ) {
 	  p;
 }
 
-name=paste0(dd,".test",".stage.roc.pdf")
+name=paste0(cc,".test",".tissue.roc.pdf")
 
  pdf(name,h=5,w=5)
 
-
-b=c("BRCA","COREAD","ESCA","LIHC","NSCLC","PACA","STAD")
+b <- as.vector(row.names(table(size$Group)))
+num <- length(b)
+print(b)
+#b=c("BRCA","COREAD","ESCA","LIHC","NSCLC","PACA","STAD")
 #b=c("Stage I","Stage II","Stage III","Stage IV","Stage X")
 
-col=c("#df9e9b","#eaaa60","#BC3C28","#99badf","#999acd")
+col=c("gray","#df9e9b","#eaaa60","#d8e7ca","#BC3C28","#99badf","#999acd","#fcd1ec")
+#col=c("#df9e9b","#eaaa60","#BC3C28","#99badf","#999acd")
 #col<-rainbow(le)
 results <- list()
 ci.auc.low=vector()
@@ -47,11 +48,11 @@ ci.auc.up=vector()
 auc=vector()
 pvalue=vector()
 p=vector()
-for (i in c(1:7) ){
+for (i in c(2:num) ){
 	   # c=a
 	   # c$Code=ifelse(c$Code!=b[i],0,1)
 	   # print(  unique(sort(c$Code)))
-	  c <- a[a$stage==b[i] | a$stage== "0.Healthy",]
+	  c <- a[a$Group==b[i] | a$Group== "0.Healthy",]
   test_r<-roc(c$Type,c$pred)
     
     # modelroc=roc(response=c$Code,predictor=c[,i+2],levels=c(0,1),direction='<')
@@ -92,7 +93,7 @@ for (i in c(1:7) ){
 	    print(ci.se(test_r,specificities=c(0.95,0.98)))
 	    
 	    
-	    if(i==1){
+	    if(i==2){
 			    plot(test_r,col=col[i],legacy.axes=T,lwd= 2)
 		  }else{
 			      plot(test_r,add=TRUE,col=col[i],lwd= 2)
@@ -100,5 +101,5 @@ for (i in c(1:7) ){
 }
 
 abline(v=0.95,col="gray60",lty=2)
-legend("bottomright",legend=c(paste0(b," AUC=",auc,",p=",p)),col=col,lty=1,bty="n",cex=0.7)
+legend("bottomright",legend=c(paste0(b[2:num]," AUC=",auc[2:num],",p=",p[2:num])),col=col,lty=1,bty="n",cex=0.7)
 dev.off()
