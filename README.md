@@ -2,10 +2,10 @@
 Distributed under the [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/ "CC BY-NC-ND")  license for **personal and academic usage only.**
 
 The following software and packages are required:
-- [ktrim v1.5.0](https://github.com/hellosunking/Ktrim/releases/tag/v1.5.0)
-- [bowtie2 v2.3.5.1](https://github.com/BenLangmead/bowtie2/releases/tag/v2.3.5.1)
+- [Ktrim v1.5.0](https://github.com/hellosunking/Ktrim/releases/tag/v1.5.0)
+- [Bowtie2 v2.3.5.1](https://github.com/BenLangmead/bowtie2/releases/tag/v2.3.5.1)
 - [Msuite2 v2.1.0](https://github.com/hellosunking/Msuite2/releases/tag/v2.1.0)
-- [bedtools v2.29.2](https://github.com/arq5x/bedtools2/releases/tag/v2.29.2)
+- [Bedtools v2.29.2](https://github.com/arq5x/bedtools2/releases/tag/v2.29.2)
 - [R v4.2.0](https://cran.r-project.org/bin/windows/base/old/4.2.0), requires "ggplot2", "ggpubr", "ggprism", "reshape2", "forcats", "ggbeeswarm", "dplyr", "cowplot", "tidyverse", "verification", "gbm", "caret", "foreach", "doParallel", "binom", and "pROC" packages.
 
 ## 1. Prepare Transposon Element (TE) regions
@@ -54,12 +54,12 @@ ktrim -1 $FASTQ1 -2 $FASTQ2 -t 8 -p 33 -o $sid.ktrim -k illumina > $sid.ktrim.lo
 
 ## read alignment. Need to build index for bowtie2 first
 hg38index=/path/to/hg38.bowtie2.index
-bowtie2 --score-min L,0,-0.2 --ignore-quals --no-unal --no-head -p 32 --minins 0 --maxins 1000 --no-mixed --no-discordant -x $hg38index -1 $sid.ktrim.read1.fq -2 $sid.ktrim.read2.fq -S $sid.sam 2> $sid.bowtie2.log
+bowtie2 --score-min L,0,-0.2 --ignore-quals --no-unal --no-head -p 16 --minins 0 --maxins 1000 --no-mixed --no-discordant -x $hg38index -1 $sid.ktrim.read1.fq -2 $sid.ktrim.read2.fq -S $sid.sam 2> $sid.bowtie2.log
 
 ## remove dupliate and convert to BED format, keep autosomal reads only
 chrsize=2.fragmentomics/0.alignment/hg38.chr.size
 $PRG/ksam_rmdup $chrsize PE $sid.sam $sid.rmdup | perl $PRG/pe_sam2bed.pl /dev/stdin /dev/stdout $sid.size 0 1 2>$sid.chr.count | sort -k1,1 -k2,2n -k3,3n | gzip > $sid.bed.gz
-## The $sid.bed.gz file will be used in the following analyses.
+## The "$sid.bed.gz" file will be used in the following analyses.
 ```
 
 For EM-seq data:
@@ -69,7 +69,7 @@ sid=sampleID
 FASTQ1=/path/to/$sid.R1.fq.gz
 FASTQ2=/path/to/$sid.R2.fq.gz
 
-PRG=2.fragmentomics/2.methylation/
+PRG=2.fragmentomics/2.methylation
 genome=hg38
 
 msuite2 -x $genome -1 $FASTQ1 -2 $FASTQ2 -o Msuite2.$sid -k illumina --cut-r1-tail 25 --cut-r2-head 25 --aligner hisat2 -p 16
@@ -104,7 +104,6 @@ done
 ## need to update the path to genome fasta file
 genomefasta=/path/to/hg38.fa
 calcFragPRG=2.fragmentomics/1.fragmentomics
-genome=hg38
 thread=16
 
 while read TEclass TEfamily extra
@@ -128,13 +127,13 @@ perl $calcFragPRG/extract.coverage.pl $genome.TE/TE.info $chrsize $sid >$sid.cov
 ## or approach the corresponding author for the file.
 EindexModel=/path/to/Eindex.model
 hg38blacklist=$calcFragPRG/ENCODE.blacklist.hg38.bed
-$calcFragPRG/calc.E-index.multi-thread $chrsize $EindexModel $hg38blacklist $sid.bed.list $thread y > $sid.E-index
+$calcFragPRG/calc.E-index.multi-thread $chrsize $EindexModel $hg38blacklist $sid.bed.list $thread y > $sid.E-index.pool
 ```
 
-## 4. Data visualizations and ROC analysis per cohort
+## 4. Data visualizations and ROC analyses per cohort
 ```
 ## we had provided the compiled data for these plots
-PRG=2.fragmentomics/3.visualization.ROC/
+PRG=2.fragmentomics/3.visualization.ROC
 ## boxplot for control samples (Fig. 1a)
 ## the fragmentomics results for 24 control samples are provided in "Processed.files" directory
 cohort=humanNC24
@@ -143,8 +142,8 @@ Rscript $PRG/control.bar.plot.R $PRG/Processed.files/$cohort.motif.pool $cohort.
 Rscript $PRG/control.bar.plot.R $PRG/Processed.files/$cohort.diversity.pool $cohort.control.diversity
 Rscript $PRG/control.coverage.bar.plot.R $PRG/Processed.files/$cohort.coverage.pool $cohort.control.coverage
 
-## size distribution (Fig. 1b)
-exampleSid=L01_2   ## this sample is choosen as an example
+## size distribution (Fig. 1b), the L01_2 sample is choosen as an example
+exampleSid=L01_2
 Rscript $PRG/plot.size.log.R $cohort.size.pdf $PRG/Processed.files/$exampleSid.Overall.size $exampleSid.all \
 $PRG/Processed.files/$exampleSid.LINE.L1.size $exampleSid.LINE.L1 \
 $PRG/Processed.files/$exampleSid.SINE.Alu.size $exampleSid.SINE.Alu \
@@ -175,7 +174,7 @@ done
 ## and merged the data to call cfDNA methylome.
 ## The list of these 20 samples are provided in "Bie.selected.20.controls.list"
 cfDNAmethylome=/path/to/pooled.control.call
-PRG=3.fragmentomics.epigenetics/1.DNAm/
+PRG=3.fragmentomics.epigenetics/1.DNAm
 
 ## calculate DNA methylation in the given TE copies
 while read TEclass TEfamily extra
@@ -193,11 +192,6 @@ done < 1.prepare.bed/$genome.TE.list
 ## here we use SINE/Alu as an example
 TEclass=SINE
 TEfamily=Alu
-
-calcFragPRG=2.fragmentomics/1.fragmentomics
-genomefasta=/path/to/hg38.fa
-genome=hg38
-thread=16
 
 bedtools intersect -f 0.5 -a $sid.bed.gz -b cfDNApool.$TEfamily.DNAm.high.bed -wao -sorted | perl $calcFragPRG/deal.overlap.pl - >$sid.$TEclass.$TEfamily.DNAm.high.bed &
 bedtools intersect -f 0.5 -a $sid.bed.gz -b cfDNApool.$TEfamily.DNAm.medium.bed -wao -sorted | perl $calcFragPRG/deal.overlap.pl - >$sid.$TEclass.$TEfamily.DNAm.medium.bed &
@@ -231,7 +225,7 @@ Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.Alu.DNAm.coverage.pool NC24.Alu
 ## here we use SINE/Alu and H3K27ac (need to update path to cfChIP-seq data) as an example
 targetEpi=H3K27ac
 epigenomeBEDfile=/path/to/H3K27ac.bed
-PRG=3.fragmentomics.epigenetics/2.histone.modification.ATAC/
+PRG=3.fragmentomics.epigenetics/2.histone.modification.ATAC
 
 ## split TE into 2 groups based on the signal in epigenome
 bedtools intersect -a $genome.TE/$TEclass.$TEfamily.bed.gz -F 0.5 -b $epigenomeBEDfile -wa -sorted -c > $TEfamily.$targetEpi.count
@@ -240,27 +234,23 @@ perl $PRG/split.TE.by.signal.pl $TEfamily.$targetEpi.count $TEfamily.$targetEpi
 python $PRG/split.TE.group.py $TEfamily.$targetEpi.group.size $TEfamily.$targetEpi.*.bed 
 
 ## for each TE family, split reads into the 2 groups defined by the epigenomic marker
-genome=hg38
-thread=16
-calcFragPRG=2.fragmentomics/1.fragmentomics
-
 bedtools intersect -f 0.5 -a $sid.bed.gz -b $TEfamily.$targetEpi.high.bed -wao -sorted | perl $calcFragPRG/deal.overlap.pl - >$sid.$TEfamily.$targetEpi.high.bed &
 bedtools intersect -f 0.5 -a $sid.bed.gz -b $TEfamily.$targetEpi.low.bed -wao -sorted | perl $calcFragPRG/deal.overlap.pl - >$sid.$TEfamily.$targetEpi.low.bed &
 
 echo -e "$sid.$TEfamily.$targetEpi.high\t$sid.$TEfamily.$targetEpi.high.bed" > $sid.$TEfamily.$targetEpi.bed.list
 echo -e "$sid.$TEfamily.$targetEpi.low\t$sid.$TEfamily.$targetEpi.low.bed" >> $sid.$TEfamily.$targetEpi.bed.list
 echo -e "$sid.Overall\t$sid.bed.gz" >> $sid.$TEfamily.$targetEpi.bed.list
-perl $PRG/analyze.motif.size.multithread.pl $genomefasta $sid.$TEfamily.$targetEpi.bed.list 2
-perl $PRG/extract.size.pl      $sid.$TEfamily.$targetEpi 150  >$sid.$TEfamily.$targetEpi.size.pool 
-perl $PRG/extract.motif.pl     $sid.$TEfamily.$targetEpi CCCA >$sid.$TEfamily.$targetEpi.motif.pool 
-perl $PRG/extract.diversity.pl $sid.$TEfamily.$targetEpi 4    >$sid.$TEfamily.$targetEpi.diversity.pool 
-perl $PRG/extract.coverage.epigenetics.pl $TEfamily.$targetEpi.group.size $chrsize $sid.$TEfamily.$targetEpi $sid >$sid.$TEfamily.$targetEpi.coverage.pool 
+perl $calcFragPRG/analyze.motif.size.multithread.pl $genomefasta $sid.$TEfamily.$targetEpi.bed.list 2
+perl $calcFragPRG/extract.size.pl      $sid.$TEfamily.$targetEpi 150  >$sid.$TEfamily.$targetEpi.size.pool 
+perl $calcFragPRG/extract.motif.pl     $sid.$TEfamily.$targetEpi CCCA >$sid.$TEfamily.$targetEpi.motif.pool 
+perl $calcFragPRG/extract.diversity.pl $sid.$TEfamily.$targetEpi 4    >$sid.$TEfamily.$targetEpi.diversity.pool 
+perl $calcFragPRG/extract.coverage.epigenetics.pl $TEfamily.$targetEpi.group.size $chrsize $sid.$TEfamily.$targetEpi $sid >$sid.$TEfamily.$targetEpi.coverage.pool 
 
 mkdir -p $sid.$TEclass.$TEfamily.$targetEpi
 mv $sid.$TEfamily.$targetEpi.bed.list  $sid.$TEfamily.*bed $sid.$TEfamily.*motif $sid.$TEfamily.*size $sid.$TEfamily.*pool $sid.$TEclass.$TEfamily.$targetEpi
 
 ## boxplots (Fig. 2a), we had provided the compiled matrix within this package
-PRG=3.fragmentomics.epigenetics/2.histone.modification.ATAC/
+PRG=3.fragmentomics.epigenetics/2.histone.modification.ATAC
 Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.H3K27ac.Alu.size.pool NC24.H3K27ac.Alu.size
 Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.H3K27ac.Alu.motif.pool NC24.H3K27ac.Alu.motif
 Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.H3K27ac.Alu.diversity.pool NC24.H3K27ac.Alu.diversity
@@ -268,7 +258,7 @@ Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.H3K27ac.Alu.coverage.pool NC24.
 ```
 
 ## 6. Chromatin state analysis
-Chromatin states were defined on cfChIP-seq data of 6 histone modifications (H3K27ac, H3K4me1, H3K4me3, H3K36me3, H3K27me3, and H3K9me3) segmented using chromHMM software.
+Chromatin states were defined on cfChIP-seq data of 6 histone modifications (H3K27ac, H3K4me1, H3K4me3, H3K36me3, H3K27me3, and H3K9me3) segmented using [chromHMM](https://compbio.mit.edu/ChromHMM/ "chromHMM") software.
 ```
 ## define chromatin states
 ## put (or link) the cfChIP-seq and cfDNA WGS data (as input) to "3.fragmentomics.epigenetics/3.chromatin.state/bed.file",
@@ -277,7 +267,7 @@ PRG=3.fragmentomics.epigenetics/3.chromatin.state
 java -mx32G -jar $PRG/ChromHMM.jar BinarizeBed -b 200 -f 2 -t out.signal $PRG/hg38.txt $PRG/bed.file/ $PRG/bed.file/markers.table $PRG/BinarizedTable
 java -mx32G -jar $PRG/ChromHMM.jar LearnModel -r 1000 -b 200 -noautoopen -p 16 $PRG/BinarizedTable $PRG/State15 15 hg38
 ## Note that the chromatin states were manually annotated based on their histone profiles
-## Our segmentation results and annotation are both provided within this package
+## Our segmentation result and annotation files are both provided within this package
 ChromatinState15=3.fragmentomics.epigenetics/3.chromatin.state/cfDNA_15_segments.bed.gz
 ChromatinStateAnno=3.fragmentomics.epigenetics/3.chromatin.state/cfDNA_15_segments.anno
 
@@ -291,11 +281,6 @@ python split.TE.group.py cfDNA_15_segments.size State.*.bed
 cd ../../
 
 ## For each sample, split the reads into each chromatin state and calculate fragmentomics
-PRG=3.fragmentomics.epigenetics/3.chromatin.state/
-genome=hg38
-genomefasta=/path/to/hg38.fa
-thread=16
-
 for CS in E{1..15}
 do
     bedtools intersect -f 0.5 -a $sid.bed.gz -b $PRG/State.$CS.bed -wao -sorted | perl $calcFragPRG/deal.overlap.pl - > $sid.$CS.bed &
@@ -305,21 +290,19 @@ wait
 echo -e "$sid.Overall\t$sid.bed.gz" >> $sid.Chromatin.State.bed.list
 
 ## Extract fragmentomics per Chromatin State
-calcFragPRG=2.fragmentomics/1.fragmentomics
 perl $calcFragPRG/analyze.motif.size.multithread.pl $genomefasta $sid.Chromatin.State.bed.list $thread
 perl $calcFragPRG/extract.size.pl      $sid.Chromatin.State 150  >$sid.Chromatin.State.size.pool 
 perl $calcFragPRG/extract.motif.pl     $sid.Chromatin.State CCCA >$sid.Chromatin.State.motif.pool 
 perl $calcFragPRG/extract.diversity.pl $sid.Chromatin.State 4    >$sid.Chromatin.State.diversity.pool 
 perl $calcFragPRG/extract.coverage.epigenetics.pl $PRG/cfDNA_15_segments.size $chrsize $sid.Chromatin.State $sid >$sid.Chromatin.State.coverage.pool
 
-## boxplots (Fig. 3b) on 24 controls, the compiled matrices are provided
+## boxplots (Fig. 3b) on 24 controls, the compiled matrices are provided within this package
 Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.chromatin.state.size.pool NC24.chromatin.state.size
 Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.chromatin.state.motif.pool NC24.chromatin.state.motif
 Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.chromatin.state.diversity.pool NC24.chromatin.state.diversity
 Rscript $PRG/boxplot.R $PRG/Processed.files/NC24.chromatin.state.coverage.pool NC24.chromatin.state.coverage
 
 ## size distribution for different chromatin state (Fig. 3c)
-exampleSid=L01_2
 Rscript $PRG/plot.mix.size.R $exampleSid.size.pdf $PRG/Processed.files/$exampleSid.E5.size TssA \
 $PRG/Processed.files/$exampleSid.E2.size Enh1 \
 $PRG/Processed.files/$exampleSid.E9.size Tx \
@@ -332,7 +315,7 @@ $PRG/Processed.files/$exampleSid.E11.size Quies1
 For whole genome sequencing data, we used the following cfDNA fragmentomic features in each TE family to build TEANA models: fraction of short fragments, CCCA end motif usage, end motif diversity, RSD, and E-index values. For Bie et al. dataset, DNA methylation densities were also included. The compiled feature matrices were provided within this package under "4.TEANA.models/" directory.
 ```
 ## TEANA-Dx diagnostic models
-PRG=4.TEANA.models/
+PRG=4.TEANA.models
 
 ## Cristiano et al. dataset (Fig. 6a,b,c)
 mkdir -p $PRG/Cristinao.Dx
@@ -356,5 +339,5 @@ Rscript $PRG/TEANA-Dx.tissue.R Bie.predict $PRG/Bie.metadata
 mkdir -p $PRG/Cristinao.Top
 Rscript $PRG/TEANA-Top.R $PRG/Cristinao.matrix $PRG/Cristinao.Top > Cristiano.Top.log
 python $PRG/get.multi.matrix.py Cristinao.multi.matrix Cristinao.cancer.matrix Bile Breast Colorectal Gastric Lung Ovarian Pancreatic
-Rscript $PRG/stat.TEANA.top.R Cristinao.multi.matrix  > TEANA-Top.predict.stat
+Rscript $PRG/stat.TEANA.top.R Cristinao.multi.matrix > TEANA-Top.predict.stat
 ```
