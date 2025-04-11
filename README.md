@@ -337,6 +337,16 @@ Rscript $PRG/roc.R Bie.predict $PRG/Bie.Dx Bie.final > Bie.mean.roc.log
 Rscript $PRG/TEANA-Dx.stage.R  Bie.predict $PRG/Bie.metadata Bie
 Rscript $PRG/TEANA-Dx.tissue.R Bie.predict $PRG/Bie.metadata Bie
 
+## For this dataset, the original study had split the samples into non-overlapping training and testing subsets
+## we trained another model using the training subset only, and applied the model to the non-overlapping testing subset
+mkdir -p $PRG/Bie.Dx.split
+Rscript $PRG/TEANA-Dx.split.R $PRG/Bie.matrix $PRG/Bie.testing.list $PRG/Bie.Dx.split > Bie.Dx.split.log
+python $PRG/average.py $PRG/Bie.Dx.split/testing_pred[0-9]* Bie.testing.predict
+Rscript $PRG/roc.R Bie.testing.predict $PRG/Bie.Dx.split Bie.split.final > Bie.split.mean.roc.log
+Rscript $PRG/TEANA-Dx.stage.R  Bie.testing.predict $PRG/Bie.metadata Bie.split
+Rscript $PRG/TEANA-Dx.tissue.R Bie.testing.predict $PRG/Bie.metadata Bie.split
+
+
 ## TEANA-Top model
 mkdir -p $PRG/Cristiano.Top
 cp $PRG/Cristiano.cancer.matrix $PRG/Cristiano.Top
