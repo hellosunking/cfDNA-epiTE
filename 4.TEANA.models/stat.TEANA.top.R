@@ -9,16 +9,16 @@ library(pROC)
 library(caret)
 library(tidyverse)
 
-args <- commandArgs(trailing=T)
-        aa <- args[1]
-        bb <- args[2]
+argv <- commandArgs(trailing=T)
+pred.tbl <- read.table(argv[1], head=T, row.names=1)
 
-pred.tbl<-read.table(file = aa,header =TRUE,row.names=1)
+p2=data.frame(Bile=pred.tbl$Bile, Breast=pred.tbl$Breast, Colorectal=pred.tbl$Colorectal,
+			  Gastric=pred.tbl$Gastric, Lung=pred.tbl$Lung, Ovarian=pred.tbl$Ovarian, Pancreatic=pred.tbl$Pancreatic)
 
-p2=data.frame(Bile=pred.tbl$Bile,Breast=pred.tbl$Breast,Colorectal=pred.tbl$Colorectal,Gastric=pred.tbl$Gastric,Lung=pred.tbl$Lung,Ovarian=pred.tbl$Ovarian,Pancreatic=pred.tbl$Pancreatic)
+b = c("Bile","Breast","Colorectal","Gastric","Lung","Ovarian","Pancreatic")
+predlab = b[apply(p2,1,which.max)]
+cm = confusionMatrix(data=as.factor(predlab), reference=as.factor(pred.tbl$Type))
 
-multiclass.roc(response=pred.tbl$Type,predictor=p2)
+cat("Prediction\\Reference\t", file=argv[2])
+write.table( cm$table, file=argv[2], append=T, quote=F, sep="\t" )
 
-b=c("Bile","Breast","Colorectal","Gastric","Lung","Ovarian","Pancreatic")
-predlab=b[apply(p2,1,which.max)]
-confusionMatrix(data=as.factor(predlab),reference=as.factor(pred.tbl$Type),mode="everything")

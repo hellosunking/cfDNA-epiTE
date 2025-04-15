@@ -1,12 +1,12 @@
 # Programs and scripts used in Gong, Pan, and Lin et al. manuscript
 Distributed under the [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/ "CC BY-NC-ND")  license for **personal and academic usage only.**
 
-The following software and packages are required:
+Our programs/codes were developed on a CentOS v7.5 (64-bit, kernal version v3.10.0) machine with the following software and packages:
 - [Ktrim v1.5.0](https://github.com/hellosunking/Ktrim/releases/tag/v1.5.0)
 - [Bowtie2 v2.3.5.1](https://github.com/BenLangmead/bowtie2/releases/tag/v2.3.5.1)
 - [Msuite2 v2.1.0](https://github.com/hellosunking/Msuite2/releases/tag/v2.1.0)
 - [Bedtools v2.29.2](https://github.com/arq5x/bedtools2/releases/tag/v2.29.2)
-- [R v4.2.0](https://cran.r-project.org/bin/windows/base/old/4.2.0), requires "ggplot2", "ggpubr", "ggprism", "reshape2", "forcats", "ggbeeswarm", "dplyr", "cowplot", "tidyverse", "verification", "gbm", "caret", "foreach", "doParallel", "binom", and "pROC" packages.
+- [R v4.1.2](https://cran.r-project.org/bin/windows/base/old/4.1.2), requires "ggplot2", "ggpubr", "ggprism", "reshape2", "forcats", "ggbeeswarm", "dplyr", "cowplot", "tidyverse", "verification", "gbm", "caret", "foreach", "doParallel", "binom", and "pROC" packages.
 
 ## 1. Prepare Transposon Element (TE) regions
 ```
@@ -27,16 +27,16 @@ gzip -d hg38.fa.gz mm10.fa.gz canFam6.fa.gz
 ## the compiled regions for hg38 are also included in this package
 for genome in hg38 mm10 canFam6
 do
-    mkdir -p $genome.TE
-    while read class family extra
-    do
-        zcat $genome.rmsk.txt.gz | perl -lane 'print "$F[5]\t$F[6]\t$F[7]" if $F[5]=~/^chr\d+$/ && $F[11] eq "'$class'" && $F[12] eq "'$family'"' | sort -k1,1 -k2,2n | gzip > $genome.TE/$class.$family.bed.gz
-    done < 1.prepare.bed/$genome.TE.list
+	mkdir -p $genome.TE
+	while read class family extra
+	do
+		zcat $genome.rmsk.txt.gz | perl -lane 'print "$F[5]\t$F[6]\t$F[7]" if $F[5]=~/^chr\d+$/ && $F[11] eq "'$class'" && $F[12] eq "'$family'"' | sort -k1,1 -k2,2n | gzip > $genome.TE/$class.$family.bed.gz
+	done < 1.prepare.bed/$genome.TE.list
 
-    ## generate TE.info
-    cd $genome.TE
-    python ../1.prepare.bed/prepare.TE.info.py TE.info *.bed.gz
-    cd ../
+	## generate TE.info
+	cd $genome.TE
+	python ../1.prepare.bed/prepare.TE.info.py TE.info *.bed.gz
+	cd ../
 done
 ```
 
@@ -84,17 +84,17 @@ perl $PRG/Msuite2.bam2bed.pl Msuite2.$sid/Msuite2.final.bam $sid.bed.gz 30 0 25
 ## calculate DNA methylation levels for each TE copy, for TEANA-Dx model
 while read TEclass TEfamily extra
 do
-    zcat $genome.TE/$TEclass.$TEfamily.bed.gz | $PRG/extract.meth.in.region $chrsize Msuite2.$sid/Msuite2.CpG.meth.call /dev/stdin > $sid.$TEfamily.meth &
+	zcat $genome.TE/$TEclass.$TEfamily.bed.gz | $PRG/extract.meth.in.region $chrsize Msuite2.$sid/Msuite2.CpG.meth.call /dev/stdin > $sid.$TEfamily.meth &
 done < 1.prepare.bed/$genome.TE.list
 wait
 
 echo -e "TEfamily\tDNAm" > $sid.meth.per.TE.txt
 for TEm in `ls $sid.*.meth`
 do
-    len=`awk '{sum+=$5}END{print sum}' $TEm`
-    per=`awk '{sum+=$6}END{print sum}' $TEm`
-    m=`echo "scale=8; $len / ($per + $len) " | bc`
-    echo -e "$TEm\t$m" >> $sid.meth.per.TE.txt
+	len=`awk '{sum+=$5}END{print sum}' $TEm`
+	per=`awk '{sum+=$6}END{print sum}' $TEm`
+	m=`echo "scale=8; $len / ($per + $len) " | bc`
+	echo -e "$TEm\t$m" >> $sid.meth.per.TE.txt
 done
 ```
 
@@ -108,9 +108,9 @@ thread=16
 
 while read TEclass TEfamily extra
 do
-    T=$TEclass.$TEfamily
-    bedtools intersect -f 0.5 -a $sid.bed.gz -b $genome.TE/$T.bed.gz -wao -sorted | perl $calcFragPRG/deal.overlap.pl - >$sid.$T.bed &
-    echo -e "$sid.$T\t$sid.$T.bed" >> $sid.bed.list
+	T=$TEclass.$TEfamily
+	bedtools intersect -f 0.5 -a $sid.bed.gz -b $genome.TE/$T.bed.gz -wao -sorted | perl $calcFragPRG/deal.overlap.pl - >$sid.$T.bed &
+	echo -e "$sid.$T\t$sid.$T.bed" >> $sid.bed.list
 done < 1.prepare.bed/$genome.TE.list
 wait
 echo -e "$sid.Overall\t$sid.bed.gz" > $sid.bed.list
@@ -153,17 +153,17 @@ $PRG/Processed.files/$exampleSid.LTR.ERVL.size $exampleSid.LTR.ERVL
 ## boxplot for cancer vs controls and ROC analyses (Fig. 4,5)
 for cohortID in HCC Liang Cristiano Bie
 do
-    Rscript $PRG/box.plot.R $PRG/Processed.files/$cohortID.size.pool $cohortID.size
-    Rscript $PRG/box.plot.R $PRG/Processed.files/$cohortID.motif.pool $cohortID.motif
+	Rscript $PRG/box.plot.R $PRG/Processed.files/$cohortID.size.pool $cohortID.size
+	Rscript $PRG/box.plot.R $PRG/Processed.files/$cohortID.motif.pool $cohortID.motif
 	Rscript $PRG/box.plot.R $PRG/Processed.files/$cohortID.diversity.pool $cohortID.diversity
 	Rscript $PRG/box.plot.R $PRG/Processed.files/$cohortID.coverage.pool $cohortID.coverage
 	Rscript $PRG/box.plot.R $PRG/Processed.files/$cohortID.E-index.pool $cohortID.E-index
 
-    Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.size.pool $cohortID.size
-    Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.motif.pool $cohortID.motif
-    Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.diversity.pool $cohortID.diversity
-    Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.coverage.pool $cohortID.coverage
-    Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.E-index.pool $cohortID.E-index
+	Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.size.pool $cohortID.size
+	Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.motif.pool $cohortID.motif
+	Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.diversity.pool $cohortID.diversity
+	Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.coverage.pool $cohortID.coverage
+	Rscript $PRG/do.ROC.R $PRG/Processed.files/$cohortID.E-index.pool $cohortID.E-index
 done
 ```
 
@@ -179,13 +179,13 @@ PRG=3.fragmentomics.epigenetics/1.DNAm
 ## calculate DNA methylation in the given TE copies
 while read TEclass TEfamily extra
 do
-    zcat $genome.TE/$TEclass.$TEfamily.bed.gz | $PRG/extract.meth.in.region $chrsize $cfDNAmethylome /dev/stdin > cfDNApool.$TEfamily.meth
+	zcat $genome.TE/$TEclass.$TEfamily.bed.gz | $PRG/extract.meth.in.region $chrsize $cfDNAmethylome /dev/stdin > cfDNApool.$TEfamily.meth
 
-    ## split TE copies into 3 categories based on the average methylation density of covered CpG sites
-    perl -lane 'print if $F[3]>=1 && $F[4]/($F[5]+$F[4]) <= 0.2' cfDNApool.$TEfamily.meth > cfDNApool.$TEfamily.DNAm.low.bed
-    perl -lane 'print if $F[3]>=1 && $F[4]/($F[5]+$F[4]) > 0.2 && $F[4]/($F[5]+$F[4]) <=0.9' cfDNApool.$TEfamily.meth > cfDNApool.$TEfamily.DNAm.medium.bed
-    perl -lane 'print if $F[3]>=1 && $F[4]/($F[5]+$F[4]) > 0.9' cfDNApool.$TEfamily.meth > cfDNApool.$TEfamily.DNAm.high.bed
-    python $PRG/split.TE.group.py $TEfamily.DNAm.group.size cfDNApool.$TEfamily.DNAm.*.bed 
+	## split TE copies into 3 categories based on the average methylation density of covered CpG sites
+	perl -lane 'print if $F[3]>=1 && $F[4]/($F[5]+$F[4]) <= 0.2' cfDNApool.$TEfamily.meth > cfDNApool.$TEfamily.DNAm.low.bed
+	perl -lane 'print if $F[3]>=1 && $F[4]/($F[5]+$F[4]) > 0.2 && $F[4]/($F[5]+$F[4]) <=0.9' cfDNApool.$TEfamily.meth > cfDNApool.$TEfamily.DNAm.medium.bed
+	perl -lane 'print if $F[3]>=1 && $F[4]/($F[5]+$F[4]) > 0.9' cfDNApool.$TEfamily.meth > cfDNApool.$TEfamily.DNAm.high.bed
+	python $PRG/split.TE.group.py $TEfamily.DNAm.group.size cfDNApool.$TEfamily.DNAm.*.bed 
 done < 1.prepare.bed/$genome.TE.list
 
 ## for each TE family, split reads into the 3 groups defined by DNA methylation level
@@ -274,7 +274,7 @@ ChromatinStateAnno=3.fragmentomics.epigenetics/3.chromatin.state/cfDNA_15_segmen
 ## split each chromatin state
 for CS in E{1..15}
 do
-    zgrep -w $CS $ChromatinState15 | sort -k1,1 -k2,2n >$PRG/State.$CS.bed
+	zgrep -w $CS $ChromatinState15 | sort -k1,1 -k2,2n >$PRG/State.$CS.bed
 done
 cd $PRG
 python split.TE.group.py cfDNA_15_segments.size State.*.bed
@@ -283,8 +283,8 @@ cd ../../
 ## For each sample, split the reads into each chromatin state and calculate fragmentomics
 for CS in E{1..15}
 do
-    bedtools intersect -f 0.5 -a $sid.bed.gz -b $PRG/State.$CS.bed -wao -sorted | perl $calcFragPRG/deal.overlap.pl - > $sid.$CS.bed &
-    echo -e "$sid.State.$CS\t$sid.$CS.bed" >> $sid.Chromatin.State.bed.list
+	bedtools intersect -f 0.5 -a $sid.bed.gz -b $PRG/State.$CS.bed -wao -sorted | perl $calcFragPRG/deal.overlap.pl - > $sid.$CS.bed &
+	echo -e "$sid.State.$CS\t$sid.$CS.bed" >> $sid.Chromatin.State.bed.list
 done
 wait
 echo -e "$sid.Overall\t$sid.bed.gz" >> $sid.Chromatin.State.bed.list
@@ -314,43 +314,43 @@ $PRG/Processed.files/$exampleSid.E11.size Quies1
 ## 7. TEANA-Dx and TEANA-Top models
 For whole genome sequencing data, we used the following cfDNA fragmentomic features in each TE family to build TEANA models: fraction of short fragments, CCCA end motif usage, end motif diversity, RSD, and E-index values. For Bie et al. dataset, DNA methylation densities were also included. The compiled feature matrices were provided within this package under "4.TEANA.models/" directory.
 ```
-## TEANA-Dx diagnostic models
 PRG=4.TEANA.models
+## TEANA-Dx diagnostic models
 
-## Cristiano et al. dataset (Fig. 6a,b,c)
+## Cristiano et al. dataset (Fig. 6a-c)
 mkdir -p $PRG/Cristiano.Dx
-cp $PRG/Cristiano.matrix $PRG/Cristiano.Dx
-Rscript $PRG/TEANA-Dx.R Cristiano.matrix $PRG/Cristiano.Dx > Cristiano.Dx.log
-python $PRG/average.py  $PRG/Cristiano.Dx/test_pred[0-9]* Cristiano.predict
-Rscript $PRG/roc.R Cristiano.predict $PRG/Cristiano.Dx Cristiano.final > Cristiano.mean.roc.log
-## statistics and ROCs
-Rscript $PRG/TEANA-Dx.stage.R  Cristiano.predict $PRG/Cristiano.metadata Cristiano
-Rscript $PRG/TEANA-Dx.tissue.R Cristiano.predict $PRG/Cristiano.metadata Cristiano
+Rscript $PRG/TEANA-Dx.Cristiano.R $PRG/Cristiano.matrix $PRG/Cristiano.Dx > Cristiano.Dx.log
+python  $PRG/average.py $PRG/Cristiano.Dx/test_pred[0-9]* Cristiano.Dx.predict
+## ROCs and statistics
+Rscript $PRG/plot.roc.R $PRG/Cristiano.Dx.predict $PRG/Cristiano.Dx Cristiano.overall.pdf > Cristiano.mean.roc.log
+Rscript $PRG/plot.TEANA-Dx.stage.R  $PRG/Cristiano.Dx.predict $PRG/Cristiano.metadata Cristiano.per.stage.pdf
+Rscript $PRG/plot.TEANA-Dx.tissue.R $PRG/Cristiano.Dx.predict $PRG/Cristiano.metadata Cristiano.per.cancer.type.pdf
 
-## Bie et al. dataset (Fig. 6d,e,f)
+## Bie et al. dataset (Fig. 6d-f)
 mkdir -p $PRG/Bie.Dx
-cp $PRG/Bie.matrix $PRG/Bie.Dx
-Rscript $PRG/TEANA-Dx.R Bie.matrix $PRG/Bie.Dx > Bie.Dx.log
-python $PRG/average.py  $PRG/Bie.Dx/test_pred[0-9]* Bie.predict
-Rscript $PRG/roc.R Bie.predict $PRG/Bie.Dx Bie.final > Bie.mean.roc.log
-## statistics and ROCs
-Rscript $PRG/TEANA-Dx.stage.R  Bie.predict $PRG/Bie.metadata Bie
-Rscript $PRG/TEANA-Dx.tissue.R Bie.predict $PRG/Bie.metadata Bie
+Rscript $PRG/TEANA-Dx.Bie.R $PRG/Bie.matrix $PRG/Bie.Dx > Bie.Dx.log
+python  $PRG/average.py $PRG/Bie.Dx/test_pred[0-9]* Bie.Dx.predict
+## ROCs and statistics
+Rscript $PRG/plot.roc.R Bie.Dx.predict $PRG/Bie.Dx Bie.overall.pdf > Bie.mean.roc.log
+Rscript $PRG/plot.TEANA-Dx.stage.R  Bie.Dx.predict $PRG/Bie.metadata Bie.per.stage.pdf
+Rscript $PRG/plot.TEANA-Dx.tissue.R Bie.Dx.predict $PRG/Bie.metadata Bie.per.cancer.type.pdf
 
-## For this dataset, the original study had split the samples into non-overlapping training and testing subsets
-## we trained another model using the training subset only, and applied the model to the non-overlapping testing subset
+## For this dataset, the original study had split the samples into non-overlapping training and testing subsets,
+## so we trained another model using the training subset only then applied it to the testing subset (Fig. 6g-i)
 mkdir -p $PRG/Bie.Dx.split
 Rscript $PRG/TEANA-Dx.split.R $PRG/Bie.matrix $PRG/Bie.testing.list $PRG/Bie.Dx.split > Bie.Dx.split.log
-python $PRG/average.py $PRG/Bie.Dx.split/testing_pred[0-9]* Bie.testing.predict
-Rscript $PRG/roc.R Bie.testing.predict $PRG/Bie.Dx.split Bie.split.final > Bie.split.mean.roc.log
-Rscript $PRG/TEANA-Dx.stage.R  Bie.testing.predict $PRG/Bie.metadata Bie.split
-Rscript $PRG/TEANA-Dx.tissue.R Bie.testing.predict $PRG/Bie.metadata Bie.split
+python  $PRG/average.py $PRG/Bie.Dx.split/testing_pred[0-9]* Bie.split.predict
+Rscript $PRG/plot.roc.R Bie.split.predict $PRG/Bie.Dx.split Bie.split.overall.pdf > Bie.split.mean.roc.log
+Rscript $PRG/plot.TEANA-Dx.stage.R  Bie.split.predict $PRG/Bie.metadata Bie.split.per.stage.pdf
+Rscript $PRG/plot.TEANA-Dx.tissue.R Bie.split.predict $PRG/Bie.metadata Bie.split.per.cancer.type.pdf
 
-
-## TEANA-Top model
+## TEANA-Top model (Table S5)
 mkdir -p $PRG/Cristiano.Top
-cp $PRG/Cristiano.cancer.matrix $PRG/Cristiano.Top
-Rscript $PRG/TEANA-Top.R Cristiano.cancer.matrix $PRG/Cristiano.Top > Cristiano.Top.log
-python $PRG/get.multi.matrix.py Cristiano.multi.matrix Cristiano.cancer.matrix Bile Breast Colorectal Gastric Lung Ovarian Pancreatic
-Rscript $PRG/stat.TEANA.top.R Cristiano.multi.matrix > TEANA-Top.predict.stat
+Rscript $PRG/TEANA-Top.R $PRG/Cristiano.cancer.matrix $PRG/Cristiano.Top > Cristiano.Top.log
+for tissueType in Bile Breast Colorectal Gastric Lung Ovarian Pancreatic
+do
+	python $PRG/average.py $PRG/Cristiano.Top/$tissueType/test_pred[0-9]* $PRG/Cristiano.Top/$tissueType/$tissueType.predict
+done
+python  $PRG/get.multi.matrix.py Cristiano.Top.detail $PRG/Cristiano.cancer.matrix $PRG/Cristiano.Top/*/*.predict
+Rscript $PRG/stat.TEANA.top.R Cristiano.Top.detail TEANA-Top.stat
 ```

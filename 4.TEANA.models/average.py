@@ -7,8 +7,6 @@ for i in range(100):
     fh.readline()
     for line in fh:
         sid="   ".join(line.split("\t")[0:2])
-        print(line.split("\t")[0:2])
-   # sum=sum+line.split("\t")[2]
         if sid in dic.keys() :
             dic[sid]=dic[sid]+float(line.strip().split("\t")[2])
         else:
