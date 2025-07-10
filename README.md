@@ -312,7 +312,7 @@ $PRG/Processed.files/$exampleSid.E11.size Quies1
 ```
 
 ## 7. TEANA-Dx and TEANA-Top models
-For whole genome sequencing data, we used the following cfDNA fragmentomic features in each TE family to build TEANA models: fraction of short fragments, CCCA end motif usage, end motif diversity, RSD, and E-index values. For Bie et al. dataset, DNA methylation densities were also included. The compiled feature matrices were provided within this package under "4.TEANA.models/" directory.
+For whole genome sequencing data in Cristiano et al. dataset, we used the following cfDNA fragmentomic features in each TE family to build TEANA models (total feature number: N=80): fraction of short fragments, CCCA end motif usage, end motif diversity, RSD, and E-index values. For Bie et al. dataset, DNA methylation densities were also included (total feature number: N=96). The compiled feature matrices were provided within this package under "4.TEANA.models/" directory.
 ```
 PRG=4.TEANA.models
 ## TEANA-Dx diagnostic models
