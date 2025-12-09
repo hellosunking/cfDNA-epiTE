@@ -56,9 +56,9 @@ ktrim -1 $FASTQ1 -2 $FASTQ2 -t 8 -p 33 -o $sid.ktrim -k illumina > $sid.ktrim.lo
 hg38index=/path/to/hg38.bowtie2.index
 bowtie2 --score-min L,0,-0.2 --ignore-quals --no-unal --no-head -p 16 --minins 0 --maxins 1000 --no-mixed --no-discordant -x $hg38index -1 $sid.ktrim.read1.fq -2 $sid.ktrim.read2.fq -S $sid.sam 2> $sid.bowtie2.log
 
-## remove dupliate and convert to BED format, keep autosomal reads only
+## remove dupliate, low-quality, and blacklist regions, keep autosomal reads only, and convert to BED format
 chrsize=2.fragmentomics/0.alignment/hg38.chr.size
-$PRG/ksam_rmdup $chrsize PE $sid.sam $sid.rmdup | perl $PRG/pe_sam2bed.pl /dev/stdin /dev/stdout $sid.size 0 1 2>$sid.chr.count | sort -k1,1 -k2,2n -k3,3n | gzip > $sid.bed.gz
+$PRG/ksam_rmdup $chrsize PE $sid.sam $sid.rmdup | perl $PRG/pe_sam2bed.pl /dev/stdin /dev/stdout $sid.size 30 1 2>$sid.chr.count | sort -k1,1 -k2,2n -k3,3n | bedtools intersect -a - -b $PRG/encode.blacklist.hg38.bed.gz -v -sorted | gzip > $sid.bed.gz
 ## The "$sid.bed.gz" file will be used in the following analyses.
 ```
 
