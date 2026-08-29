@@ -1,4 +1,4 @@
-# Programs and scripts used in Gong, Pan, and Lin et al. manuscript
+# Programs and scripts used in Gong, Pan, and Lin et al. Nature Communications 2026 paper.
 Distributed under the [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/ "CC BY-NC-ND")  license for **personal and academic usage only.**
 
 Our programs/codes were developed on a CentOS v7.5 (64-bit, kernal version v3.10.0) machine with the following software and packages:
@@ -354,3 +354,10 @@ done
 python  $PRG/get.multi.matrix.py Cristiano.Top.detail $PRG/Cristiano.cancer.matrix $PRG/Cristiano.Top/*/*.predict
 Rscript $PRG/stat.TEANA.top.R Cristiano.Top.detail TEANA-Top.stat
 ```
+
+## Citation
+When referencing, please cite "Gong F, Pan Y, Lin H et al. **Epigenomic modifications define chromatin states to regulate cell-free DNA fragmentomics.**
+*Nat Commun.* 2026 Jul 18; 17:8801."
+[PubMed](https://www.ncbi.nlm.nih.gov/pubmed/42471313 "PubMed")
+[Full Text](https://www.nature.com/articles/s41467-026-75640-2 "Full text")
+
